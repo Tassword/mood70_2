@@ -1,0 +1,124 @@
+import requests
+import random
+
+def get_repository_info(api_token, owner, repo_name):
+    # Токен авторизации GitHub API
+    headers = {
+        "Authorization": api_token,
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # URL для получения информации о репозитории
+    repo_url = f"https://api.github.com/repos/{owner}/{repo_name}"
+
+    # Отправка GET-запроса к GitHub API для получения информации о репозитории
+    response = requests.get(repo_url, headers=headers)
+
+    # Проверка статуса ответа
+    if response.status_code == 200:
+        repository_info = response.json()
+        return repository_info
+    elif response.status_code == 404:
+        print(f"Репозиторий {owner}/{repo_name} не найден.")
+        return None
+    else:
+        print("Ошибка при выполнении запроса:", response.status_code)
+        return None
+
+def get_random_repositories(api_token, query, count=5):
+    # Токен авторизации GitHub API
+    headers = {
+        "Authorization": api_token,
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # Параметры запроса для поиска репозиториев
+    params = {
+        "q": query,
+        "sort": "stars",
+        "order": "desc",
+        "per_page": 100  # Увеличьте per_page, чтобы получить больше результатов
+    }
+
+    # URL для поиска репозиториев
+    search_url = "https://api.github.com/search/repositories"
+
+    # Отправка GET-запроса к GitHub API для поиска репозиториев
+    response = requests.get(search_url, headers=headers, params=params)
+
+    # Проверка статуса ответа
+    if response.status_code == 200:
+        repositories = response.json()["items"] if "items" in response.json() else []
+        random_repositories = random.sample(repositories, min(count, len(repositories)))
+        return random_repositories
+    else:
+        print("Ошибка при выполнении запроса:", response.status_code)
+        return None
+
+# Токен GitHub API
+api_token = "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"
+
+# Имена репозиториев
+slf4j_owner = "qos-ch"
+slf4j_repo_name = "slf4j"
+
+logback_owner = "qos-ch"
+logback_repo_name = "logback"
+
+log4j_owner = "apache"
+log4j_repo_name = "log4j"
+
+# Получение информации о репозитории slf4j
+slf4j_info = get_repository_info(api_token, slf4j_owner, slf4j_repo_name)
+if slf4j_info:
+    print(f"Информация о репозитории {slf4j_repo_name}:")
+    print(slf4j_info["html_url"])
+else:
+    print(f"Не удалось получить информацию о репозитории {slf4j_repo_name}")
+
+# Получение информации о репозитории logback
+logback_info = get_repository_info(api_token, logback_owner, logback_repo_name)
+if logback_info:
+    print(f"Информация о репозитории {logback_repo_name}:")
+    print(logback_info["html_url"])
+else:
+    print(f"Не удалось получить информацию о репозитории {logback_repo_name}")
+
+# Получение информации о репозитории log4j
+log4j_info = get_repository_info(api_token, log4j_owner, log4j_repo_name)
+if log4j_info:
+    print(f"Информация о репозитории {log4j_repo_name}:")
+    print(log4j_info["html_url"])
+else:
+    print(f"Не удалось получить информацию о репозитории {log4j_repo_name}")
+
+# Получение 5 случайных репозиториев по запросу "log4j"
+random_log4j_repositories = get_random_repositories(api_token, "log4j", count=5)
+
+# Вывод информации о случайных репозиториях
+if random_log4j_repositories:
+    print("\nСлучайные репозитории (log4j):")
+    for repo in random_log4j_repositories:
+        print(repo["html_url"])
+else:
+    print("Не удалось получить случайные репозитории с буквами 'log4j'.")
+
+random_logback_repositories = get_random_repositories(api_token, "logback", count=5)
+    # Вывод информации о случайных репозиториях
+if random_logback_repositories:
+    print("\nСлучайные репозитории (logback):")
+    for repo in random_logback_repositories:
+        print(repo["html_url"])
+else:
+    print("Не удалось получить случайные репозитории с буквами 'logback'.")
+
+# Получение 5 случайных репозиториев по запросу "slf4j"
+random_slf4j_repositories = get_random_repositories(api_token, "slf4j", count=5)
+
+# Вывод информации о случайных репозиториях
+if random_slf4j_repositories:
+    print("\nСлучайные репозитории (slf4j):")
+    for repo in random_slf4j_repositories:
+        print(repo["html_url"])
+else:
+    print("Не удалось получить случайные репозитории с буквами 'slf4j'.")
